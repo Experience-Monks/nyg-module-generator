@@ -35,10 +35,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/jam3/nyg-module-generator.git"
+    "url": "git://github.com/Jam3/nyg-module-generator.git"
   },
-  "homepage": "https://github.com/jam3/nyg-module-generator",
+  "homepage": "https://github.com/Jam3/nyg-module-generator",
   "bugs": {
-    "url": "https://github.com/jam3/nyg-module-generator/issues"
+    "url": "https://github.com/Jam3/nyg-module-generator/issues"
   }
 }
