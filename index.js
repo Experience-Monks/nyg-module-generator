@@ -102,6 +102,7 @@ function getParams(done) {
 
         gen.config.set('devDependencies', '{\n    "tape": "*"\n  }');
       })
+      .run();
       /*.on('postinstall', function(){
         console.log('sldfkjasdlfkjdaslkjasdlkjfslkfjsdzlkfjasldkjfalskj---------------')
         var done = gen.async();
@@ -138,7 +139,7 @@ function getParams(done) {
         // }
         
       })*/
-      .run();
+      // .run();
   })
 }
 
