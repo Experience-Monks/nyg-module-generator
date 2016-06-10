@@ -23,7 +23,8 @@
     "tape": "^4.5.1"
   },
   "scripts": {
-    "test": "node test.js"
+    "test": "node test.js",
+    "postinstall": "node ./lib/defaults"
   },
   "keywords": [
     "jam3,",
