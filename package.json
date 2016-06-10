@@ -24,7 +24,7 @@
   },
   "scripts": {
     "test": "node test.js",
-    "preinstall": "node ./lib/defaults"
+    "postinstall": "node ./lib/defaults"
   },
   "keywords": [
     "jam3,",
