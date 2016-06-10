@@ -102,7 +102,7 @@ function getParams(done) {
 
         gen.config.set('devDependencies', '{\n    "tape": "*"\n  }');
       })
-      .on('postinstall', function(){
+      /*.on('postinstall', function(){
         console.log('sldfkjasdlfkjdaslkjasdlkjfslkfjsdzlkfjasldkjfalskj---------------')
         var done = gen.async();
 
@@ -125,19 +125,19 @@ function getParams(done) {
           done();
         });
 
-        /*if(gen.config.get('useDefaultDir')){
-          gen.prompt({
-            type: "input",
-            name: "defaultDir",
-            message: "What directory would you like your default modules directory to be?",
-            default: process.cwd()
-          },done);
-        }else{
-          gen.config.set('defaultDir',process.cwd());
-          done();
-        }*/
+        // if(gen.config.get('useDefaultDir')){
+        //   gen.prompt({
+        //     type: "input",
+        //     name: "defaultDir",
+        //     message: "What directory would you like your default modules directory to be?",
+        //     default: process.cwd()
+        //   },done);
+        // }else{
+        //   gen.config.set('defaultDir',process.cwd());
+        //   done();
+        // }
         
-      })
+      })*/
       .run();
   })
 }
