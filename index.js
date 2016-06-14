@@ -103,43 +103,7 @@ function getParams(done) {
         gen.config.set('devDependencies', '{\n    "tape": "*"\n  }');
       })
       .run();
-      /*.on('postinstall', function(){
-        console.log('sldfkjasdlfkjdaslkjasdlkjfslkfjsdzlkfjasldkjfalskj---------------')
-        var done = gen.async();
 
-        gen.prompt({
-          'type': 'confirm',
-          'name': 'useDefaultDir',
-          'message': 'Would you like to specify a default directory for generated modules? You can override this later.',
-          'default': true,
-          'filter': function(input){
-            if(input === 'y') return 'yes';
-            if(input === 'n') return 'no';
-          },
-          'validate': function(input){
-            input = input.toLowerCase();
-            if(input !== 'y' || input !== 'yes') return false;
-            if(input !== 'n' || input !== 'no') return false;
-            return true
-          }
-        }, function(){
-          done();
-        });
-
-        // if(gen.config.get('useDefaultDir')){
-        //   gen.prompt({
-        //     type: "input",
-        //     name: "defaultDir",
-        //     message: "What directory would you like your default modules directory to be?",
-        //     default: process.cwd()
-        //   },done);
-        // }else{
-        //   gen.config.set('defaultDir',process.cwd());
-        //   done();
-        // }
-        
-      })*/
-      // .run();
   })
 }
 
