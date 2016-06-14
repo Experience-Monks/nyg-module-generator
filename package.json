@@ -10,7 +10,10 @@
     "url": "https://github.com/BrenanNeufeld"
   },
   "dependencies": {
+    "bluebird": "^3.4.0",
     "chalk": "^1.1.3",
+    "ghrepo": "^1.3.2",
+    "no-op": "^1.0.3",
     "npm": "^3.9.5",
     "npmconf": "^2.1.2",
     "nyg": "^2.0.2",
