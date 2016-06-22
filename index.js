@@ -11,6 +11,7 @@ var fs = require('fs');
 var xtend = require('xtend');
 var loadJson = Promise.promisify(require('./lib/loadJson'));
 var spawn = require('npm-execspawn');
+var open = require('opn');
 
 var argv = require('yargs')
   .alias('t', 'test')
@@ -27,6 +28,18 @@ var useNygConf = false;
 var hasPkgJson = false;
 var hasNygConf = false;
 
+function hasFile(file) {
+  try {
+    fs.statSync(file);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+hasPkgJson = hasFile(target + "/package.json");
+console.log('hasPkgJson: ', hasPkgJson);
+
 
 var configs = {
   nyg: {
@@ -38,6 +51,49 @@ var configs = {
   npm: {},
   git: {}
 };
+
+/*var locationPrompts = [
+  {
+    'name': 'location'
+    , 'message': 'Where would you like to put the module?'  //where would you like the module to live?
+    , 'default': path.basename(target)
+  }
+];*/
+
+var modulePrompts = [
+  {
+    'name': 'location'
+    , 'message': 'Where would you like to put the module?'  //where would you like the module to live?
+    , 'default': path.basename(target)
+  },
+  {
+    'name': 'name'
+    , 'message': 'Module name'
+    , 'default': path.basename(target)
+  },
+  {
+    'name': 'description'
+    , 'message': 'Module description'
+  },
+  {
+    'name': 'tags'
+    , 'message': 'Module tags:'
+  },
+  {
+    'name': 'stability'
+    , 'type': 'list'
+    , 'message': 'Module stability:'
+    , 'default': 'experimental'
+    , 'choices': [
+    'deprecated'
+    , 'experimental'
+    , 'unstable'
+    , 'stable'
+    , 'frozen'
+    , 'locked'
+  ]
+  }
+];
 
 function getNygConfig() {
   return loadJson(configs.nyg.configPath)
@@ -53,7 +109,7 @@ function getNygConfig() {
 }
 
 function getPkgJson() {
-  return configs;
+  if(!hasPkgJson) return {};
   return loadJson(configs.pkg.configPath)
     .then(function (data) {
       configs.pkg = xtend(configs.pkg, data);
@@ -117,54 +173,29 @@ function getNpmConfig() {
 
 Promise.all([getNygConfig(), getPkgJson(), getNpmConfig()])
   .then(function (data) {
-    'use strict';
-    console.log('--done, configs: ', data[0]);
-    startPrompts(data[0], function(data){
-      return data;
-    })
+    if(configs.nyg.useDefaultDir){
+      modulePrompts[0].default = configs.nyg.defaultDir;
+    }else if(!configs.nyg.useDefaultDir && hasPkgJson){
+      modulePrompts[0].default = process.cwd().replace(path.basename(process.cwd()), '');
+    }else{
+      modulePrompts[0].default = process.cwd();
+    }
+    startPrompts(configs);
   });
 
 
 function startPrompts(data, cb) {
   'use strict';
-  var prompts = [
-    {
-      'name': 'name'
-      , 'message': 'Module name'
-      , 'default': path.basename(target)
-    },
-    {
-      'name': 'description'
-      , 'message': 'Module description'
-    },
-    {
-      'name': 'tags'
-      , 'message': 'Module tags:'
-    },
-    {
-      'name': 'stability'
-      , 'type': 'list'
-      , 'message': 'Module stability:'
-      , 'default': 'experimental'
-      , 'choices': [
-      'deprecated'
-      , 'experimental'
-      , 'unstable'
-      , 'stable'
-      , 'frozen'
-      , 'locked'
-    ]
-    }
-  ];
 
-  var outputDir = data.nyg.defaultDir+'/module-test-1';
-  console.log('outputDir: ',outputDir);
+  // var outputDir = data.nyg.defaultDir + '/module-test-1';
+  // console.log('outputDir: ', outputDir);
 
   var globs = [{base: 'templates/', glob: '*'}];
   // var globs = [{base: 'templates/', glob: '*', output: '{{modulePath}}'}];
-  var gen = nyg(prompts, globs)
+  var gen = nyg(modulePrompts, globs)
     .on('postprompt', function () {
-      gen.chdir(outputDir);
+      configs.outputDir = path.join(gen.config.get('location'), gen.config.get('name'));
+      gen.chdir(configs.outputDir);
       gen.config.set('name', dequote(gen.config.get('name')));
       gen.config.set('testDescription', escape(gen.config.get('description')).replace(/\\"+/g, '\"'));
       gen.config.set('description', dequote(gen.config.get('description')));
@@ -174,13 +205,43 @@ function startPrompts(data, cb) {
       }).filter(Boolean), null, 2));
       gen.config.set('devDependencies', '{\n    "tape": "*"\n  }');
     })
-    .on('postinstall', function(){
+    .on('postinstall', function () {
+      open(configs.outputDir);
       var cmd = 'ghrepo --color';
-      var child = spawn(cmd, {cwd: outputDir});
-      child.on('exit', function(err) {
+      var child = spawn(cmd, {cwd: configs.outputDir});
+      child.on('exit', function (err) {
         if (err === 0) {
-          process.exit(0)
-        }else{
+          // process.exit(0)
+          var location = gen.config.get('location');
+
+          gen.prompt({
+            type: "confirm",
+            name: "doInstall",
+            message: "Would you like to install this module in an existing project?",
+            default: true
+          },function(data){
+            if(data.doInstall){
+              gen.prompt({
+                'name': 'installLocation'
+                , 'message': 'Where would you like to install it?'  //where would you like the module to live?
+                , 'default': process.cwd()
+              }, function(answers){
+                console.log('answers.installLocation: ',answers.installLocation);
+                var cmd = 'npm install git+'+configs.npm.user.url+'/'+gen.config.get('name')+' --save';
+                var installProc = spawn(cmd, {cwd: answers.installLocation});
+                installProc.on('exit', function (err) {
+                  process.exit(0);
+                });
+                installProc.stdout.pipe(process.stdout);
+                installProc.stderr.pipe(process.stderr);
+                process.stdin.pipe(installProc.stdin);
+              });
+            }else{
+              process.exit(0);
+            }
+          });
+
+        } else {
           console.log('git command failed');
           process.exit(1)
         }
