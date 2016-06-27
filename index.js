@@ -38,8 +38,6 @@ function hasFile(file) {
 }
 
 hasPkgJson = hasFile(target + "/package.json");
-console.log('hasPkgJson: ', hasPkgJson);
-
 
 var configs = {
   nyg: {
@@ -52,13 +50,6 @@ var configs = {
   git: {}
 };
 
-/*var locationPrompts = [
-  {
-    'name': 'location'
-    , 'message': 'Where would you like to put the module?'  //where would you like the module to live?
-    , 'default': path.basename(target)
-  }
-];*/
 
 var modulePrompts = [
   {
@@ -185,13 +176,8 @@ Promise.all([getNygConfig(), getPkgJson(), getNpmConfig()])
 
 
 function startPrompts(data, cb) {
-  'use strict';
-
-  // var outputDir = data.nyg.defaultDir + '/module-test-1';
-  // console.log('outputDir: ', outputDir);
 
   var globs = [{base: 'templates/', glob: '*'}];
-  // var globs = [{base: 'templates/', glob: '*', output: '{{modulePath}}'}];
   var gen = nyg(modulePrompts, globs)
     .on('postprompt', function () {
       configs.outputDir = path.join(gen.config.get('location'), gen.config.get('name'));
@@ -208,12 +194,10 @@ function startPrompts(data, cb) {
     .on('postinstall', function () {
       open(configs.outputDir);
       var cmd = 'ghrepo --color';
-      var child = spawn(cmd, {cwd: configs.outputDir});
+      var child = spawn(cmd, {cwd: configs.outputDir, stdio: 'inherit' });
       child.on('exit', function (err) {
         if (err === 0) {
-          // process.exit(0)
           var location = gen.config.get('location');
-
           gen.prompt({
             type: "confirm",
             name: "doInstall",
@@ -226,7 +210,6 @@ function startPrompts(data, cb) {
                 , 'message': 'Where would you like to install it?'  //where would you like the module to live?
                 , 'default': process.cwd()
               }, function(answers){
-                console.log('answers.installLocation: ',answers.installLocation);
                 var cmd = 'npm install git+'+configs.npm.user.url+'/'+gen.config.get('name')+' --save';
                 var installProc = spawn(cmd, {cwd: answers.installLocation});
                 installProc.on('exit', function (err) {
@@ -246,9 +229,9 @@ function startPrompts(data, cb) {
           process.exit(1)
         }
       });
-      child.stdout.pipe(process.stdout);
+      /*child.stdout.pipe(process.stdout);
       child.stderr.pipe(process.stderr);
-      process.stdin.pipe(child.stdin);
+      process.stdin.pipe(child.stdin);*/
     })
     .run();
 }
