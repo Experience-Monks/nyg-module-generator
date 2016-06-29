@@ -54,7 +54,7 @@ var configs = {
 var modulePrompts = [
   {
     'name': 'location'
-    , 'message': 'Where would you like to put the module?'  //where would you like the module to live?
+    , 'message': 'Where would you like to put the module?'
     , 'default': path.basename(target)
   },
   {
