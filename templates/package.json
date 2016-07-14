@@ -12,7 +12,7 @@
   "dependencies": {},
   "devDependencies": {{{devDependencies}}},
   "scripts": {
-    "test": "node test.js"
+    "test": "node test/test.js"
   },
   "keywords": {{{tags}}},
   "repository": {
