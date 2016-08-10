@@ -19,6 +19,7 @@
     "npmconf": "^2.1.2",
     "nyg": "^2.2.0",
     "opn": "^4.0.2",
+    "prompt-sync": "^4.1.4",
     "semver": "^5.1.0",
     "variable-name": "0.0.1",
     "xtend": "^4.0.1",
