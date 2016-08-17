@@ -1,6 +1,6 @@
 {
   "name": "nyg-module-generator",
-  "version": "1.7.1",
+  "version": "1.8.0",
   "description": "A module generator script. If the current directory has a “package.json” file, the module will be created outside the current directory and a symlink will be created from the current directories “node_modules” folder to the generated module.",
   "main": "index.js",
   "license": "MIT",
